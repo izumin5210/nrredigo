@@ -7,9 +7,15 @@
   revision = "47dc60e71eed504e3ef8e77ee3c6fe720f3be57f"
   version = "v1.3.0"
 
+[[projects]]
+  name = "github.com/newrelic/go-agent"
+  packages = [".","internal","internal/cat","internal/jsonx","internal/logger","internal/sysinfo","internal/utilization"]
+  revision = "f5bce3387232559bcbe6a5f8227c4bf508dac1ba"
+  version = "v1.11.0"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7418b78693071cf71e0c60bc37387272ec15e585e3c02cf32d128c6e7de1bb88"
+  inputs-digest = "e826dc51a781ac8b1b33c3ebe1f170dacb1ed51d37db4df7fdaf8775f44a3b3b"
   solver-name = "gps-cdcl"
   solver-version = 1
