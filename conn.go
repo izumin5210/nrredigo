@@ -17,17 +17,51 @@ type wrappedConn struct {
 	txn newrelic.Transaction
 }
 
-func (c *wrappedConn) Do(commandName string, args ...interface{}) (reply interface{}, err error) {
-	// TODO: should start and end a new newrelic datastore segment
+func (c *wrappedConn) Do(commandName string, args ...interface{}) (interface{}, error) {
+	if c.txn != nil {
+		seg := c.createSegment()
+		seg.Operation = commandName
+		seg.ParameterizedQuery = formatCommand(commandName, args)
+		defer seg.End()
+	}
 	return c.Conn.Do(commandName, args...)
 }
 
 func (c *wrappedConn) Send(commandName string, args ...interface{}) error {
-	// TODO: should buffer commands and their args
+	if c.txn != nil {
+		seg := c.createSegment()
+		seg.Operation = commandName
+		seg.ParameterizedQuery = formatCommand(commandName, args)
+		defer seg.End()
+	}
 	return c.Conn.Send(commandName, args...)
 }
 
 func (c *wrappedConn) Flush() error {
-	// TODO: should start and end a new newrelic datastore segment for pipelining operations
+	if c.txn != nil {
+		seg := c.createSegment()
+		seg.Operation = "flush"
+		defer seg.End()
+	}
 	return c.Conn.Flush()
+}
+
+func (c *wrappedConn) Receive() (interface{}, error) {
+	if c.txn != nil {
+		seg := c.createSegment()
+		seg.Operation = "receive"
+		defer seg.End()
+	}
+	return c.Conn.Receive()
+}
+
+func (c *wrappedConn) createSegment() newrelic.DatastoreSegment {
+	return newrelic.DatastoreSegment{
+		StartTime: newrelic.StartSegmentNow(c.txn),
+		Product:   newrelic.DatastoreRedis,
+		// TODO
+		// Host:         c.host,
+		// PortPathOrID: c.id,
+		// DatabaseName: c.databaseName,
+	}
 }
