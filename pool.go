@@ -23,5 +23,5 @@ type wrappedPool struct {
 }
 
 func (p *wrappedPool) Get() redis.Conn {
-	return wrapConn(p.Get(), p.txn)
+	return wrapConn(p.Pool.Get(), p.txn)
 }
