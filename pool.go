@@ -1,27 +1,37 @@
 package nrredigo
 
 import (
+	"context"
+
 	"github.com/gomodule/redigo/redis"
 	"github.com/newrelic/go-agent"
 )
 
 // Pool is an interface for representing a pool of Redis connections
 type Pool interface {
-	Get() redis.Conn
+	GetContext(ctx context.Context) (redis.Conn, error)
 }
 
-func WrapPool(p Pool, txn newrelic.Transaction) Pool {
+func Wrap(p Pool) Pool {
 	return &wrappedPool{
 		Pool: p,
-		txn:  txn,
 	}
 }
 
 type wrappedPool struct {
 	Pool
-	txn newrelic.Transaction
 }
 
-func (p *wrappedPool) Get() redis.Conn {
-	return wrapConn(p.Pool.Get(), p.txn)
+func (p *wrappedPool) GetContext(ctx context.Context) (conn redis.Conn, err error) {
+	conn, err = p.Pool.GetContext(ctx)
+	if err != nil {
+		return
+	}
+
+	nrtx := newrelic.FromContext(ctx)
+	if nrtx != nil {
+		conn = wrapConn(conn, nrtx)
+	}
+
+	return
 }
