@@ -27,3 +27,4 @@
 
 [[constraint]]
   name = "github.com/newrelic/go-agent"
+  version = "^2.1"

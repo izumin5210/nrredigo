@@ -13,7 +13,7 @@
   version = "v2.0.0"
 
 [[projects]]
-  digest = "1:9281bd443e42018aa5bb72e08a6c4a0fa548b7168c1d2deda23e6ca5684e4c50"
+  digest = "1:740eceac63d29a55061c4278edfa4e713d2c13c82440d5de4d37b5fdcb540b1d"
   name = "github.com/newrelic/go-agent"
   packages = [
     ".",
@@ -25,8 +25,8 @@
     "internal/utilization",
   ]
   pruneopts = ""
-  revision = "f5bce3387232559bcbe6a5f8227c4bf508dac1ba"
-  version = "v1.11.0"
+  revision = "a138039206f5b43233e37885306a4dfbdd20e5ce"
+  version = "v2.2.0"
 
 [solve-meta]
   analyzer-name = "dep"
