@@ -2,15 +2,18 @@
 
 
 [[projects]]
-  name = "github.com/garyburd/redigo"
+  digest = "1:dcf8316121302735c0ac84e05f4686e3b34e284444435e9a206da48d8be18cb1"
+  name = "github.com/gomodule/redigo"
   packages = [
     "internal",
-    "redis"
+    "redis",
   ]
-  revision = "47dc60e71eed504e3ef8e77ee3c6fe720f3be57f"
-  version = "v1.3.0"
+  pruneopts = ""
+  revision = "9c11da706d9b7902c6da69c592f75637793fe121"
+  version = "v2.0.0"
 
 [[projects]]
+  digest = "1:9281bd443e42018aa5bb72e08a6c4a0fa548b7168c1d2deda23e6ca5684e4c50"
   name = "github.com/newrelic/go-agent"
   packages = [
     ".",
@@ -19,14 +22,18 @@
     "internal/jsonx",
     "internal/logger",
     "internal/sysinfo",
-    "internal/utilization"
+    "internal/utilization",
   ]
+  pruneopts = ""
   revision = "f5bce3387232559bcbe6a5f8227c4bf508dac1ba"
   version = "v1.11.0"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "caa9edcc22dffd9b2f241b90bbd7a2ec44b6d73728145e177f7bd61a0858c357"
+  input-imports = [
+    "github.com/gomodule/redigo/redis",
+    "github.com/newrelic/go-agent",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
