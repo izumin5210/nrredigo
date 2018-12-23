@@ -5,16 +5,18 @@ import (
 	"github.com/newrelic/go-agent"
 )
 
-func wrapConn(c redis.Conn, txn newrelic.Transaction) redis.Conn {
+func wrapConn(c redis.Conn, txn newrelic.Transaction, cfg *Config) redis.Conn {
 	return &wrappedConn{
 		Conn: c,
 		txn:  txn,
+		cfg:  cfg,
 	}
 }
 
 type wrappedConn struct {
 	redis.Conn
 	txn newrelic.Transaction
+	cfg *Config
 }
 
 func (c *wrappedConn) Do(commandName string, args ...interface{}) (interface{}, error) {
@@ -57,11 +59,10 @@ func (c *wrappedConn) Receive() (interface{}, error) {
 
 func (c *wrappedConn) createSegment() newrelic.DatastoreSegment {
 	return newrelic.DatastoreSegment{
-		StartTime: newrelic.StartSegmentNow(c.txn),
-		Product:   newrelic.DatastoreRedis,
-		// TODO
-		// Host:         c.host,
-		// PortPathOrID: c.id,
-		// DatabaseName: c.databaseName,
+		StartTime:    newrelic.StartSegmentNow(c.txn),
+		Product:      newrelic.DatastoreRedis,
+		Host:         c.cfg.Host,
+		PortPathOrID: c.cfg.PortPathOrID,
+		DatabaseName: c.cfg.DBName,
 	}
 }

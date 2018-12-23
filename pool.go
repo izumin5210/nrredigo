@@ -12,9 +12,10 @@ type Pool interface {
 	GetContext(ctx context.Context) (redis.Conn, error)
 }
 
-func Wrap(p Pool) Pool {
+func Wrap(p Pool, opts ...Option) Pool {
 	return &wrappedPool{
 		Pool: p,
+		cfg:  createConfig(opts),
 	}
 }
 
@@ -30,7 +31,7 @@ func (p *wrappedPool) GetContext(ctx context.Context) (conn redis.Conn, err erro
 
 	nrtx := newrelic.FromContext(ctx)
 	if nrtx != nil {
-		conn = wrapConn(conn, nrtx)
+		conn = wrapConn(conn, nrtx, cfg)
 	}
 
 	return
