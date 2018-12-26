@@ -22,7 +22,9 @@
 
 
 [[constraint]]
-  name = "github.com/garyburd/redigo"
+  name = "github.com/gomodule/redigo"
+  version = "^2.0"
 
 [[constraint]]
   name = "github.com/newrelic/go-agent"
+  version = "^2.1"

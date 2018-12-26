@@ -1,26 +1,29 @@
 package nrredigo
 
 import (
-	"github.com/garyburd/redigo/redis"
+	"strings"
+
+	"github.com/gomodule/redigo/redis"
 	"github.com/newrelic/go-agent"
 )
 
-func wrapConn(c redis.Conn, txn newrelic.Transaction) redis.Conn {
+func wrapConn(c redis.Conn, txn newrelic.Transaction, cfg *Config) redis.Conn {
 	return &wrappedConn{
 		Conn: c,
 		txn:  txn,
+		cfg:  cfg,
 	}
 }
 
 type wrappedConn struct {
 	redis.Conn
 	txn newrelic.Transaction
+	cfg *Config
 }
 
 func (c *wrappedConn) Do(commandName string, args ...interface{}) (interface{}, error) {
 	if c.txn != nil {
-		seg := c.createSegment()
-		seg.Operation = commandName
+		seg := c.createSegment(commandName)
 		seg.ParameterizedQuery = formatCommand(commandName, args)
 		defer seg.End()
 	}
@@ -29,8 +32,7 @@ func (c *wrappedConn) Do(commandName string, args ...interface{}) (interface{}, 
 
 func (c *wrappedConn) Send(commandName string, args ...interface{}) error {
 	if c.txn != nil {
-		seg := c.createSegment()
-		seg.Operation = commandName
+		seg := c.createSegment(commandName)
 		seg.ParameterizedQuery = formatCommand(commandName, args)
 		defer seg.End()
 	}
@@ -39,8 +41,7 @@ func (c *wrappedConn) Send(commandName string, args ...interface{}) error {
 
 func (c *wrappedConn) Flush() error {
 	if c.txn != nil {
-		seg := c.createSegment()
-		seg.Operation = "flush"
+		seg := c.createSegment("flush")
 		defer seg.End()
 	}
 	return c.Conn.Flush()
@@ -48,20 +49,19 @@ func (c *wrappedConn) Flush() error {
 
 func (c *wrappedConn) Receive() (interface{}, error) {
 	if c.txn != nil {
-		seg := c.createSegment()
-		seg.Operation = "receive"
+		seg := c.createSegment("receive")
 		defer seg.End()
 	}
 	return c.Conn.Receive()
 }
 
-func (c *wrappedConn) createSegment() newrelic.DatastoreSegment {
+func (c *wrappedConn) createSegment(cmdName string) newrelic.DatastoreSegment {
 	return newrelic.DatastoreSegment{
-		StartTime: newrelic.StartSegmentNow(c.txn),
-		Product:   newrelic.DatastoreRedis,
-		// TODO
-		// Host:         c.host,
-		// PortPathOrID: c.id,
-		// DatabaseName: c.databaseName,
+		StartTime:    newrelic.StartSegmentNow(c.txn),
+		Product:      newrelic.DatastoreRedis,
+		Operaiton:    strings.ToLower(cmdName),
+		Host:         c.cfg.Host,
+		PortPathOrID: c.cfg.PortPathOrID,
+		DatabaseName: c.cfg.DBName,
 	}
 }
