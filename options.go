@@ -1,4 +1,4 @@
-package nrsql
+package nrredigo
 
 // Config contains metadata to send to New Relic.
 type Config struct {
