@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/gomodule/redigo/redis"
-	"github.com/newrelic/go-agent"
+	newrelic "github.com/newrelic/go-agent"
 )
 
 func wrapConn(c redis.Conn, txn newrelic.Transaction, cfg *Config) redis.Conn {
@@ -59,7 +59,7 @@ func (c *wrappedConn) createSegment(cmdName string) newrelic.DatastoreSegment {
 	return newrelic.DatastoreSegment{
 		StartTime:    newrelic.StartSegmentNow(c.txn),
 		Product:      newrelic.DatastoreRedis,
-		Operaiton:    strings.ToLower(cmdName),
+		Operation:    strings.ToLower(cmdName),
 		Host:         c.cfg.Host,
 		PortPathOrID: c.cfg.PortPathOrID,
 		DatabaseName: c.cfg.DBName,
