@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/gomodule/redigo/redis"
-	"github.com/newrelic/go-agent"
+	newrelic "github.com/newrelic/go-agent"
 )
 
 // Pool is an interface for representing a pool of Redis connections
@@ -21,6 +21,7 @@ func Wrap(p Pool, opts ...Option) Pool {
 
 type wrappedPool struct {
 	Pool
+	cfg *Config
 }
 
 func (p *wrappedPool) GetContext(ctx context.Context) (conn redis.Conn, err error) {
@@ -31,7 +32,7 @@ func (p *wrappedPool) GetContext(ctx context.Context) (conn redis.Conn, err erro
 
 	nrtx := newrelic.FromContext(ctx)
 	if nrtx != nil {
-		conn = wrapConn(conn, nrtx, cfg)
+		conn = wrapConn(conn, nrtx, p.cfg)
 	}
 
 	return
