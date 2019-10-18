@@ -1,4 +1,4 @@
-module github.com/rerost/nrredigo
+module github.com/izumin5210/nrredigo
 
 go 1.13
 
